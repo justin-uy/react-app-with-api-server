@@ -1,26 +1,49 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+
+  constructor() {
+    super();
+    this.state = {
+      currentQuestion: null,
+    }
+  }
+
+  componentDidMount() {
+    fetch('http://localhost:3001/next-question', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        this.setState({
+          currentQuestion: data,
+        });
+      });
+  }
+  render() {
+    const { currentQuestion } = this.state;
+    if (!currentQuestion) {
+      return null;
+    }
+
+    return (
+      <div className="App">
+        <div style={{ fontWeight: "bold" }}>{currentQuestion.question}</div>
+        {
+          currentQuestion.answers.map(
+            (answer, idx) =>
+              <div key={'answer-option-' + idx}>
+                <input type="radio" /> {answer}
+              </div>
+          )
+        }
+      </div>
+    );
+  }
 }
 
 export default App;
